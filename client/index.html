@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Socket Chat</title>
     <script type="module">
         import { io } from 'https://cdn.socket.io/4.7.4/socket.io.esm.min.js';
-
         const socket = io('http://192.168.237.215:3000', {
             auth: {
-                serverOffset: 0
+                serverOffset: 0,
+                username: prompt('Ingrese su nombre de usuario')
             }
         });
-
+        // Verifica si username se ingresó correctamente
+        if (!socket.auth.username) {
+            alert('Se necesita un nombre de usuario.');
+            location.reload();
+        }
         const form = document.getElementById('form');
         const input = document.getElementById('input');
         const messages = document.getElementById('messages');
-
         // Desplegamos un prompt para que el usuario ingrese su nombre, sin la capacidad de que el usuario pueda cancelar el prompt
         const username = prompt('Ingrese su nombre de usuario');
         if (!username) {
@@ -25,15 +27,12 @@
         }
         // Asignamos el nombre de usuario al socket
         socket.auth.username = username;
-
         socket.on('chat message', (msg, serverOffset, username) => {
             // Creamos un item que despliegue en un li el mensaje que se envió junto con el nombre de usuario
             const item = `<li>${username}: ${msg}</li>`;
-
             messages.insertAdjacentHTML('beforeend', item);
             socket.auth.serverOffset = serverOffset;
         });
-
         form.addEventListener('submit', function (e) {
             e.preventDefault();
 
@@ -42,7 +41,6 @@
                 input.value = '';
             }
         });
-
 
     </script>
     <style>
@@ -104,7 +102,6 @@
             width: 100%;
             right: 0;
         }
-
         #input {
 
             border-radius: 9999px;
@@ -129,25 +126,13 @@
         }
     </style>
 </head>
-
 <body>
-
     <section id="chat">
-
         <ul id="messages"></ul>
-
-
         <form id="form">
-
             <input type="text" name="message" id="input" placeholder="Type a message" autocomplete="off">
             <button type="submit">Enviar</button>
-
         </form>
-
     </section>
-
-
-
 </body>
-
 </html>
